@@ -1,0 +1,6 @@
+# data files
+*.csv
+*.mat
+
+# compiled cache
+__pycache__
