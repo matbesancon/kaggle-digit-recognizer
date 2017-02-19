@@ -7,8 +7,9 @@ Created on Sat Feb 18 17:09:01 2017
 
 import numpy as np
 import matplotlib.pyplot as plt
-from exploratory import matrix, resquare, viz_pixel
+import pandas as pd
 from skimage.morphology import skeletonize, medial_axis
+from exploratory import matrix, resquare, viz_pixel
 
 
 def binarize(array, threshold=200):
@@ -24,8 +25,8 @@ def skeleton_image(img_array, median=False, dim=28):
     """
     img = resquare(binarize(img_array)//255, dim)
     if median:
-        return medial_axis(img).flatten()
-    return skeletonize(img).flatten()
+        return (255*medial_axis(img)).flatten()
+    return (255*skeletonize(img)).flatten()
 
 
 def compare_res(img_array, dim=28):
@@ -43,7 +44,14 @@ def compare_res(img_array, dim=28):
     plt.show()
 
 if __name__ == "__main__":
+    num_plots = 0
     # random index generator
-    index = (np.random.randint(0, matrix.shape[0]) for _ in range(5))
+    index = (np.random.randint(0, matrix.shape[0]) for _ in range(num_plots))
     for idx in index:
         compare_res(matrix[idx, :])
+    matrix_processed_median = [skeleton_image(matrix[i, :], True) for i in range(matrix.shape[0])]
+    matrix_processed =        [skeleton_image(matrix[i, :]) for i in range(matrix.shape[0])]
+    pd.DataFrame(np.array(matrix_processed)).to_csv(
+            "data/matrix_skeleton.csv", header=False, index=False)
+    pd.DataFrame(np.array(matrix_processed_median)).to_csv(
+            "data/matrix_skeleton_median.csv", header=False, index=False)
