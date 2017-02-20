@@ -6,7 +6,6 @@ Created on Sun Feb 12 21:16:30 2017
 """
 
 import sys
-
 import pandas as pd
 import numpy as np
 from sklearn import neighbors
@@ -19,6 +18,16 @@ if len(sys.argv) > 1:
 else:
     matrix_file = "data/matrix.csv"
 
+# Minkowski distance power
+if len(sys.argv) > 2:
+    distance_metric = sys.argv[2]
+else:
+    distance_metric = '2'
+if distance_metric not in {'1', '2'}:
+    distance_metric = 2
+else:
+    distance_metric = int(distance_metric)
+
 matrix = pd.read_csv(matrix_file, header=None).values
 labels = pd.read_csv("data/labels.csv", header=None).values[:, 0]
 
@@ -26,7 +35,7 @@ confusion_results = []
 for _ in range(20):
     X_train, X_test, y_train, y_test = train_test_split(
         matrix, labels, test_size=0.4, random_state=0)
-    clf = neighbors.KNeighborsClassifier(weights='distance')
+    clf = neighbors.KNeighborsClassifier(weights='distance', p=distance_metric)
     clf.fit(X_train, y_train)
     z = clf.predict(X_test)
     confusion_results.append(np.array(confusion_matrix(y_test, z)))
